@@ -9,39 +9,41 @@ function App() {
   const [list, setList] = useState([]);
 
   const addFriend = () => {
-    Axios.post('http://localhost:3001/addfriend', {name: name, age: age})
-    .then((response) => {
-        setList([...list, {_id: response.data._id, name: name, age: age}]); //add without refreshing
-      },
-    );
+    Axios.post('https://mern-beginner.herokuapp.com/addfriend', {
+      name: name,
+      age: age,
+    }).then((response) => {
+      setList([...list, {_id: response.data._id, name: name, age: age}]); //add without refreshing
+    });
   };
 
   const update = (id) => {
     const newAge = prompt('Add new age');
-    Axios.put('http://localhost:3001/update', {newAge: newAge, id: id}).then(
+    Axios.put('https://mern-beginner.herokuapp.com/update', {
+      newAge: newAge,
+      id: id,
+    }).then(() => {
+      setList(
+        list.map((val) => {
+          return val._id === id ? {_id: id, name: val.name, age: newAge} : val;
+        }),
+      );
+    });
+  };
+
+  const remove = (id) => {
+    Axios.delete(`https://mern-beginner.herokuapp.com/delete/${id}`).then(
       () => {
         setList(
-          list.map((val) => {
-            return val._id === id
-              ? {_id: id, name: val.name, age: newAge}
-              : val;
+          list.filter((val) => {
+            return val._id !== id;
           }),
         );
       },
     );
   };
-
-  const remove = (id) => {
-    Axios.delete(`http://localhost:3001/delete/${id}`).then(() => {
-      setList(
-        list.filter((val) => {
-          return val._id !== id;
-        }),
-      );
-    });
-  };
   useEffect(() => {
-    Axios.get('http://localhost:3001/read')
+    Axios.get('https://mern-beginner.herokuapp.com/read')
       .then((response) => {
         setList(response.data);
       })
